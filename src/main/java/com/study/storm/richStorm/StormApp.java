@@ -26,7 +26,7 @@ public class StormApp {
 
         //提交topology
         cluster.submitTopology("StormApp", config, builder.createTopology());
-        Thread.sleep(10000);
+        Thread.sleep(300000);
 
         //停止集群
         cluster.shutdown();
