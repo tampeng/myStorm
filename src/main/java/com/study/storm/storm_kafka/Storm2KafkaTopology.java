@@ -4,20 +4,25 @@ package com.study.storm.storm_kafka;
 import com.study.storm.utils.Constant;
 import org.apache.storm.Config;
 import org.apache.storm.LocalCluster;
+import org.apache.storm.StormSubmitter;
+import org.apache.storm.generated.AlreadyAliveException;
+import org.apache.storm.generated.AuthorizationException;
+import org.apache.storm.generated.InvalidTopologyException;
 import org.apache.storm.kafka.*;
 import org.apache.storm.spout.SchemeAsMultiScheme;
 import org.apache.storm.topology.TopologyBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
 public class Storm2KafkaTopology {
     private static final Logger LOGGER = LoggerFactory.getLogger(Storm2KafkaTopology.class);
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         LOGGER.info("Storm2KafkaTopology拓扑开始启动");
 
         // BrokerHosts接口有2个实现类StaticHosts和ZkHosts,ZkHosts会定时(默认60秒)从ZK中更新brokers的信息,StaticHosts是则不会
-        // 要注意这里的第二个参数brokerZkPath要和kafka中的server.properties中配置的zookeeper.connect对应
+        // 要注意这里的第一个参数brokerZkPath要和kafka中的server.properties中配置的zookeeper.connect对应
         // 因为这里是需要在zookeeper中找到brokers znode
         // 默认kafka的brokers znode是存储在zookeeper根目录下
         BrokerHosts brokerHosts = new ZkHosts(Constant.ZK_HOST_PORT);
@@ -45,28 +50,37 @@ public class Storm2KafkaTopology {
         spoutConfig.scheme = new SchemeAsMultiScheme(new StringScheme());
         LOGGER.info("SpoutConfig设置完成");
 
+        LOGGER.info("Topology设置...");
         TopologyBuilder builder = new TopologyBuilder();
         builder.setSpout("KafkaSpout",new KafkaSpout(spoutConfig),1);
-        builder.setBolt("SentenceBost",new SentenceBolt(),3).shuffleGrouping("KafkaSpout");
-        builder.setBolt("PrinterBost",new PrinterBolt(),3).shuffleGrouping("SentenceBost");
-
+        builder.setBolt("SentenceBolt",new SentenceBolt(),1).shuffleGrouping("KafkaSpout");
+        builder.setBolt("PrinterBolt",new PrinterBolt(),1).shuffleGrouping("SentenceBolt");
+        LOGGER.info("Topology设置完成");
         Config config = new Config();
-        config.setDebug(false) ;
-        LocalCluster cluster = new LocalCluster();
-        cluster.submitTopology("KafkaStrom",config, builder.createTopology());
+        //config.setDebug(false) ;
 
-/*        // 本地运行或者提交到集群
+        // 本地运行或者提交到集群
         if (args != null && args.length == 1) {
             // 集群运行
+            LOGGER.info("线上提交Topology");
+            try {
                 StormSubmitter.submitTopology(args[0], config, builder.createTopology());
+            } catch (AlreadyAliveException e) {
+                e.printStackTrace();
+            } catch (InvalidTopologyException e) {
+                e.printStackTrace();
+            } catch (AuthorizationException e) {
+                e.printStackTrace();
+            }
         }else {
+            LOGGER.info("本地提交Topology");
             // 本地运行
             LocalCluster localCluster = new LocalCluster();
-            localCluster.submitTopology("K2Stopology", config, builder.createTopology());
+            localCluster.submitTopology("Kafka2StormTopology", config, builder.createTopology());
             // 这里为了测试方便就不shutdown了
             Thread.sleep(10000000);
             // cluster.shutdown();
-        }*/
+        }
 
     }
 }

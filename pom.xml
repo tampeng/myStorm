@@ -7,31 +7,40 @@
     <groupId>myStorm</groupId>
     <artifactId>com.study</artifactId>
     <version>1.0-SNAPSHOT</version>
-
     <dependencies>
-        <!-- storm的依赖关系 -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>3.8.1</version>
+            <scope>test</scope>
+        </dependency>
+
         <dependency>
             <groupId>org.apache.storm</groupId>
             <artifactId>storm-core</artifactId>
-            <version>1.2.1</version>
-            <scope>provided</scope>
-
+            <version>1.0.1</version>
+            <!--<scope>provided</scope>-->
         </dependency>
-        <!-- storm-kafka依赖关系 -->
+
         <dependency>
             <groupId>org.apache.storm</groupId>
             <artifactId>storm-kafka</artifactId>
-            <version>1.1.0</version>
-            <!--<optional>true</optional>-->
+            <version>1.0.1</version>
         </dependency>
 
-        <!-- kafka的依赖关系 -->
         <dependency>
             <groupId>org.apache.kafka</groupId>
-            <artifactId>kafka_2.10</artifactId>
-            <version>0.10.2.1</version>
-            <!-- 这个必须要加，否则会有jar包冲突导致无法 -->
+            <artifactId>kafka_2.9.2</artifactId>
+            <version>0.8.2.2</version>
             <exclusions>
+                <exclusion>
+                    <groupId>org.apache.zookeeper</groupId>
+                    <artifactId>zookeeper</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-log4j12</artifactId>
@@ -39,46 +48,10 @@
             </exclusions>
         </dependency>
 
-        <!--<dependency>-->
-            <!--<groupId>org.apache.zookeeper</groupId>-->
-            <!--<artifactId>zookeeper</artifactId>-->
-            <!--<version>3.4.10</version>-->
-            <!--&lt;!&ndash;<type>pom</type>&ndash;&gt;-->
-        <!--</dependency>-->
-
-        <!--<dependency>-->
-            <!--<groupId>org.apache.thrift</groupId>-->
-            <!--<artifactId>libthrift</artifactId>-->
-            <!--<version>0.9.3</version>-->
-        <!--</dependency>-->
     </dependencies>
 
-    <!--如果依赖外部包，就打不进去外部包，所以需要引入下面所示-->
     <build>
         <plugins>
-            <plugin>
-                <!--把其他外部依赖的jar包打成一个大jar包-->
-                <artifactId>maven-assembly-plugin</artifactId>
-                <configuration>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                    <archive>
-                        <manifest>
-                            <mainClass>com.study.storm.richStorm.StormApp</mainClass>
-                        </manifest>
-                    </archive>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>make-assembly</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -89,7 +62,6 @@
             </plugin>
         </plugins>
     </build>
-
 
 
 </project>

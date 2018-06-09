@@ -22,12 +22,13 @@ public class SentenceBolt extends BaseBasicBolt {
     @Override
     public void execute(Tuple tuple, BasicOutputCollector basicOutputCollector) {
         String word = tuple.getString(0);
-        if (StringUtils.isBlank(word))
+        if (StringUtils.isBlank(word)) {
             return;
-        LOGGER.info(word);
+        }
+        System.out.println("Received Word:" + word);
         words.add(word);
-        if (word.endsWith(".")){
-            basicOutputCollector.emit(ImmutableList.of((Object) StringUtils.join(words,' ')));
+        if (word.endsWith(".")) {
+            basicOutputCollector.emit(ImmutableList.of((Object) StringUtils.join(words, ' ')));
             words.clear();
         }
     }
