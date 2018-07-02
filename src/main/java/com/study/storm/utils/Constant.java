@@ -9,4 +9,10 @@ public class Constant {
     public static final String TOPIC_TEST	= "test";
 
     public static final String SPOUT_TEST = "kafka2storm";
+
+    // mysql
+    public static final String MYSQL_DRIVER = "com.mysql.jdbc.Driver";
+    public static final String MYSQL_URL = "jdbc:mysql://192.168.128.11:3306/test";
+    public static final String MYSQL_USER = "bigdata";
+    public static final String MYSQL_PASSWORD = "123456";
 }
